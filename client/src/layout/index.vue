@@ -16,6 +16,10 @@
           <el-icon><Shop /></el-icon>
           <span>店铺管理</span>
         </el-menu-item>
+        <el-menu-item index="/ydshop">
+          <el-icon><Shop /></el-icon>
+          <span>闲鱼店铺</span>
+        </el-menu-item>
         <!-- <el-menu-item index="/good">
           <el-icon><Goods /></el-icon>
           <span>商品管理</span>

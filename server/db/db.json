@@ -958,5 +958,19 @@
       "autoPush": false,
       "createTime": "2025-03-28T10:59:56.790Z"
     }
+  ],
+  "ydshops": [
+    {
+      "shopId": "2216612392490",
+      "name": "小轩素材铺",
+      "url": "https://www.goofish.com/personal?spm=a21ybx.item.itemHeader.1.7db23da6ix2aGa&userId=2216612392490",
+      "sale": 0,
+      "productCount": 300,
+      "isExtract": true,
+      "status": 1,
+      "delFlag": 0,
+      "createTime": "2025-03-28T10:06:49.240Z",
+      "introduction": "【本店已缴纳足额保证金，请放心购买】..."
+    }
   ]
 }

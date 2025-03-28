@@ -33,6 +33,27 @@ const routes = [
         }
       },
       {
+        path: 'ydshop',
+        name: 'YdShop',
+        component: () => import('../views/ydshop/index.vue'),
+        meta: {
+          title: '闲鱼店铺',
+          icon: 'Shop',
+          requiresAuth: true
+        }
+      },
+      {
+        path: 'ydgood',
+        name: 'YdGood',
+        component: () => import('../views/ydgood/index.vue'),
+        meta: {
+          title: '闲鱼商品',
+          icon: 'Goods',
+          requiresAuth: true,
+          hidden: true
+        }
+      },
+      {
         path: 'good',
         name: 'Good',
         component: () => import('../views/good/index.vue'),

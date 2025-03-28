@@ -5,6 +5,12 @@ import session from 'koa-session';
 import registerRoutes from './routes/index.js';
 import responseHandler from './middleware/response.js';
 import paginationHandler from './middleware/pagination.js';
+import todoRouter from './routes/todo.js';
+import userRouter from './routes/user.js';
+import shopRouter from './routes/shop.js';
+import goodRouter from './routes/good.js';
+import ydshopRouter from './routes/ydshop.js';
+import ydgoodRouter from './routes/ydgood.js';
 
 const app = new Koa();
 
@@ -33,6 +39,14 @@ app.use(paginationHandler);
 
 // 自动注册路由
 registerRoutes(app);
+
+// 注册路由
+app.use(todoRouter.routes());
+app.use(userRouter.routes());
+app.use(shopRouter.routes());
+app.use(goodRouter.routes());
+app.use(ydshopRouter.routes());
+app.use(ydgoodRouter.routes());
 
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
