@@ -16,14 +16,19 @@
           <el-icon><Shop /></el-icon>
           <span>店铺管理</span>
         </el-menu-item>
+        <el-menu-item index="/good">
+          <el-icon><Goods /></el-icon>
+          <span>商品管理</span>
+        </el-menu-item>
         <el-menu-item index="/ydshop">
           <el-icon><Shop /></el-icon>
           <span>闲鱼店铺</span>
         </el-menu-item>
-        <!-- <el-menu-item index="/good">
-          <el-icon><Goods /></el-icon>
-          <span>商品管理</span>
-        </el-menu-item> -->
+        <el-menu-item index="/ydaccount">
+          <el-icon><User /></el-icon>
+          <span>闲鱼账号</span>
+        </el-menu-item>
+        
       </el-menu>
     </el-aside>
 
@@ -62,7 +67,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { List, Shop, Goods, Expand, ArrowDown } from '@element-plus/icons-vue'
+import { List, Shop, Goods, Expand, ArrowDown, User } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const isCollapse = ref(false)
@@ -80,14 +85,39 @@ const toggleSidebar = () => {
 
 .aside {
   transition: width 0.3s;
-  background-color: #304156;
+  background-color: #1f2d3d;
   overflow: hidden;
 }
 
 .el-menu-vertical {
   height: 100%;
-  background-color: #304156;
+  background-color: #1f2d3d;
   border-right: none;
+  
+  :deep(.el-menu-item) {
+    background-color: #1f2d3d;
+    color: #a6b0bc;
+    
+    &:hover {
+      background-color: #263445;
+      color: #fff;
+    }
+    
+    &.is-active {
+      background-color: #263445 !important;
+      color: #409eff !important;
+      border-right: 3px solid #409eff;
+    }
+    
+    .el-icon {
+      color: inherit;
+    }
+    
+    span {
+      color: inherit;
+      margin-left: 10px;
+    }
+  }
 }
 
 .main-container {
@@ -134,5 +164,17 @@ const toggleSidebar = () => {
   padding: 20px;
   height: calc(100vh - 50px);
   overflow-y: auto;
+}
+
+:deep(.el-menu) {
+  border-right: none !important;
+}
+
+:deep(.el-menu--collapse) {
+  .el-menu-item {
+    span {
+      display: none;
+    }
+  }
 }
 </style> 

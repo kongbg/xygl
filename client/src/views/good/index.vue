@@ -18,50 +18,15 @@
       
       <!-- 商品列表 -->
       <el-table :data="goods" style="width: 100%">
-        <el-table-column prop="name" label="商品名称"  />
-        <el-table-column prop="no" label="商品编号" width="120" />
+        <el-table-column prop="name" label="商品名称" />
+        <el-table-column prop="shopId" label="店铺ID" width="120" />
         <el-table-column prop="price" label="价格" width="100">
           <template #default="{ row }">
             ¥{{ row.price }}
           </template>
         </el-table-column>
-        <el-table-column prop="stock" label="库存" width="80" />
-        <el-table-column prop="wantCot" label="想要人数" width="100" />
-        <el-table-column prop="viewCot" label="浏览人数" width="100" />
-        <el-table-column label="商品图片" width="100">
-          <template #default="{ row }">
-            <el-image
-              style="width: 50px; height: 50px"
-              :src="row.picUrl"
-              :preview-src-list="[row.picUrl]"
-            />
-            <!-- <el-image
-              v-if="row.urls?.[0]"
-              style="width: 50px; height: 50px"
-              :src="row.urls[0]"
-              :preview-src-list="row.urls"
-            /> -->
-          </template>
-        </el-table-column>
-        <el-table-column prop="description" label="商品描述" show-overflow-tooltip>
-          <template #default="{ row }">
-            {{ row.description || '-' }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="autoPush" label="售罄自动上架" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.autoPush ? 'success' : 'info'">
-              {{ row.autoPush ? '是' : '否' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="isExtract" label="信息提取" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.isExtract ? 'success' : 'warning'">
-              {{ row.isExtract ? '已提取' : '未提取' }}
-            </el-tag>
-          </template>
-        </el-table-column>
+        <el-table-column prop="wantCot" label="想要人数" width="100" sortable />
+        <el-table-column prop="viewCot" label="浏览量" width="100" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="row.status ? 'success' : 'info'">
@@ -69,28 +34,27 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="250" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" width="180">
+          <template #default="{ row }">
+            {{ new Date(row.createTime).toLocaleString() }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
               link
-              @click="handleEdit(row)"
+              @click="handleView(row)"
             >
-              编辑
+              查看
             </el-button>
             <el-button
               type="success"
               link
-              @click="handleToggleStatus(row)"
+              :href="row.shareUrl"
+              target="_blank"
             >
-              {{ row.status ? '禁用' : '启用' }}
-            </el-button>
-            <el-button
-              type="danger"
-              link
-              @click="handleDelete(row)"
-            >
-              删除
+              链接
             </el-button>
           </template>
         </el-table-column>
@@ -244,7 +208,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Back, Plus } from '@element-plus/icons-vue'
@@ -305,22 +269,30 @@ const fetchShopInfo = async () => {
   }
 }
 
-// 获取列表数据
+// 获取商品列表
 const fetchGoods = async () => {
   try {
     const { data } = await request.get('/goods', {
-      params: { 
-        shopId,
-        page: page.value, 
-        pageSize: pageSize.value 
+      params: {
+        page: page.value,
+        pageSize: pageSize.value
       }
     })
-    goods.value = data.list
-    total.value = data.pagination.total
+    // 从分页数据中获取列表和总数
+    goods.value = data.list || []
+    total.value = data.pagination?.total || 0
+    page.value = data.pagination?.page || 1
+    pageSize.value = data.pagination?.pageSize || 10
   } catch (error) {
     console.error('获取商品列表失败:', error)
+    ElMessage.error('获取商品列表失败')
   }
 }
+
+// 监听分页变化
+watch([page, pageSize], () => {
+  fetchGoods()
+})
 
 // 处理文件变化
 const handleFileChange = (uploadFile) => {
@@ -487,10 +459,14 @@ const startParsing = async (goodId) => {
   }
 }
 
+// 查看商品详情
+const handleView = (row) => {
+  window.open(row.url, '_blank')
+}
+
 // 处理分页变化
 const handleSizeChange = (val) => {
   pageSize.value = val
-  page.value = 1
   fetchGoods()
 }
 
@@ -500,12 +476,6 @@ const handleCurrentChange = (val) => {
 }
 
 onMounted(() => {
-  if (!shopId) {
-    ElMessage.error('店铺ID不能为空')
-    router.push('/shop')
-    return
-  }
-  // fetchShopInfo()
   fetchGoods()
 })
 </script>

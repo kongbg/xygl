@@ -43,14 +43,13 @@ const routes = [
         }
       },
       {
-        path: 'ydgood',
-        name: 'YdGood',
-        component: () => import('../views/ydgood/index.vue'),
+        path: 'ydaccount',
+        name: 'YdAccount',
+        component: () => import('../views/ydaccount/index.vue'),
         meta: {
-          title: '闲鱼商品',
-          icon: 'Goods',
-          requiresAuth: true,
-          hidden: true
+          title: '闲鱼账号',
+          icon: 'User',
+          requiresAuth: true
         }
       },
       {
@@ -60,6 +59,16 @@ const routes = [
         meta: {
           title: '商品管理',
           icon: 'Goods',
+          requiresAuth: true
+        }
+      },
+      {
+        path: 'ydgood',
+        name: 'YdGood',
+        component: () => import('../views/ydgood/index.vue'),
+        meta: {
+          title: '闲鱼商品',
+          icon: 'Shop',
           requiresAuth: true,
           hidden: true
         }

@@ -2,7 +2,207 @@ import puppeteer from "puppeteer-core"; // 注意使用 core 版本
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import { fileURLToPath } from "url";
+import axios from 'axios';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const BASE_URL = 'https://home.ekeew.com';
+const BROWSER_PATH = process.platform === "win32"
+  ? "C:/Program Files/Google/Chrome/Application/chrome.exe"
+  : "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+
+// 存储浏览器实例
+const browserInstances = new Map();
+
+// 创建axios实例
+const request = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+  headers: {
+    'accept': 'application/json, text/plain, */*',
+    'accept-language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
+  }
+});
+
+export default class YdglTool {
+  // 获取key
+  static async getKey() {
+    try {
+      const response = await request.get('/adminapi/login/info');
+      if (response.data.status === 200) {
+        return response.data.data.key;
+      }
+      throw new Error(response.data.msg || '获取key失败');
+    } catch (error) {
+      console.error('获取key失败:', error);
+      throw error;
+    }
+  }
+
+  // 获取登录二维码
+  static async getLoginQrCode(account, pwd) {
+    let browser = null;
+    try {
+      browser = await puppeteer.launch({
+        executablePath: BROWSER_PATH,
+        headless: false,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      });
+
+      const page = await browser.newPage();
+      let scanSuccess = false;
+      
+      // 设置视口大小
+      await page.setViewport({
+        width: 800,
+        height: 600
+      });
+      
+      // 监听网络请求
+      page.on('response', async (response) => {
+        const url = response.url();
+        // 监听登录成功的请求
+        if (url.includes('/adminapi/yudian')) {
+          try {
+            const data = await response.json();
+            if (data.status === 200) {
+              scanSuccess = true;
+              // 触发回调
+              if (browserInstances.has(instanceId)) {
+                const instance = browserInstances.get(instanceId);
+                instance.onScanSuccess?.(data.data);
+              }
+            }
+          } catch (error) {
+            console.error('解析响应失败:', error);
+          }
+        }
+      });
+
+      // 存储浏览器实例
+      const instanceId = `${account}_${Date.now()}`;
+      browserInstances.set(instanceId, {
+        browser,
+        scanSuccess,
+        timer: setTimeout(async () => {
+          // 3分钟后关闭浏览器
+          if (browserInstances.has(instanceId)) {
+            const instance = browserInstances.get(instanceId);
+            await instance.browser.close();
+            browserInstances.delete(instanceId);
+          }
+        }, 180000) // 3分钟 = 180000毫秒
+      });
+
+      await page.setUserAgent(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+      );
+
+      // 访问登录页面
+      await page.goto(
+        `https://home.ekeew.com/yudian/xylogin?account=${account}&pwd=${pwd}&type=1`,
+        { waitUntil: 'networkidle0' }
+      );
+
+      let qrImage;
+      try {
+        // 先尝试获取iframe中的二维码
+        const frames = await page.frames();
+        const loginFrame = frames.find(frame => 
+          frame.url().includes('/login') || frame.url().includes('/xylogin')
+        );
+        
+        if (loginFrame) {
+          // 等待二维码区域加载
+          await loginFrame.waitForSelector('.extra-login-content', { timeout: 5000 });
+          const qrElement = await loginFrame.$('.extra-login-content');
+          qrImage = await qrElement.screenshot({
+            encoding: 'base64'
+          });
+        } else {
+          throw new Error('找不到登录iframe');
+        }
+      } catch (error) {
+        console.warn('获取iframe中的二维码失败，将截取整个页面:', error);
+        // 如果获取不到二维码元素，就截取整个页面
+        await sleep(3000); // 等待页面完全加载
+        
+        // 获取页面尺寸
+        const viewport = await page.viewport();
+        
+        // 截取右上角固定尺寸区域
+        qrImage = await page.screenshot({
+          encoding: 'base64',
+          clip: {
+            x: viewport.width - 320, // 从右边往左320px
+            y: 0,
+            width: 320, // 固定宽度320px
+            height: 400 // 固定高度400px
+          }
+        });
+      }
+
+      return {
+        qrCode: qrImage,
+        instanceId
+      };
+    } catch (error) {
+      if (browser) await browser.close();
+      console.error('获取登录二维码失败:', error);
+      throw error;
+    }
+  }
+
+  // 关闭指定的浏览器实例
+  static async closeBrowser(instanceId) {
+    if (browserInstances.has(instanceId)) {
+      const instance = browserInstances.get(instanceId);
+      clearTimeout(instance.timer);
+      await instance.browser.close();
+      browserInstances.delete(instanceId);
+    }
+  }
+
+  // 登录
+  static async login(account, pwd, key) {
+    try {
+      const response = await request.post('/adminapi/yudian', {
+        account,
+        pwd,
+        key,
+        captchaType: 'blockPuzzle',
+        captchaVerification: ''
+      });
+
+      if (response.data.status === 200) {
+        return {
+          token: response.data.data.token,
+          expires_time: response.data.data.expires_time
+        };
+      } else if(response.data.status === 101) { // 需要扫码
+        // 获取二维码
+        const { qrCode, instanceId } = await this.getLoginQrCode(account, pwd);
+        return {
+          status: 101,
+          qrCode,
+          instanceId
+        };
+      }
+      throw new Error(response.data.msg || '登录失败');
+    } catch (error) {
+      console.error('登录失败:', error);
+      throw error;
+    }
+  }
+
+  // 注册扫码成功回调
+  static onScanSuccess(instanceId, callback) {
+    if (browserInstances.has(instanceId)) {
+      const instance = browserInstances.get(instanceId);
+      instance.onScanSuccess = callback;
+    }
+  }
+}
 
 export const getShopInfo = async (params) => {
     return new Promise(async (resolve, reject) => {

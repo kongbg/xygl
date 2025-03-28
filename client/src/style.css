@@ -26,6 +26,7 @@ body {
 /* Element Plus 全局样式覆盖 */
 .el-menu-item {
   font-size: 14px !important;
+  color: #fff!important;
 }
 
 .el-header {

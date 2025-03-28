@@ -972,5 +972,17 @@
       "createTime": "2025-03-28T10:06:49.240Z",
       "introduction": "【本店已缴纳足额保证金，请放心购买】..."
     }
+  ],
+  "ydaccounts": [
+    {
+      "id": "88ebf884-fa66-4612-93f9-7358e0292bc2",
+      "username": "18588444431",
+      "password": "ydgl123456",
+      "token": "",
+      "isBind": "true",
+      "status": 1,
+      "delFlag": 0,
+      "createTime": "2025-03-28T14:11:02.873Z"
+    }
   ]
 }
