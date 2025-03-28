@@ -1,0 +1,20 @@
+{
+  "name": "koa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^5.0.0",
+    "element-plus": "^2.9.7",
+    "koa": "^2.16.0",
+    "koa-body": "^6.0.1",
+    "koa-router": "^13.0.1",
+    "lowdb": "^7.0.1"
+  }
+}

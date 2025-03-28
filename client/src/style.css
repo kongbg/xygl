@@ -1,0 +1,50 @@
+/* 重置默认样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* 设置基础字体大小 */
+  font-size: 12px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+}
+
+/* Element Plus 全局样式覆盖 */
+.el-menu-item {
+  font-size: 14px !important;
+}
+
+.el-header {
+  --el-header-height: 60px !important;
+}
+
+.el-menu-item [class^="el-icon"] {
+  font-size: 18px !important;
+}
+
+.el-button {
+  font-size: 14px !important;
+}
+
+.el-card__header {
+  font-size: 16px !important;
+  padding: 15px 20px !important;
+}
+
+.el-table {
+  font-size: 14px !important;
+}
