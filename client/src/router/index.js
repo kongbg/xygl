@@ -85,6 +85,18 @@ const routes = [
         }
       }
     ]
+  },
+  {
+    path: '/source',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Source',
+        component: () => import('@/views/source/index.vue'),
+        meta: { title: '资源库', icon: 'Files' }
+      }
+    ]
   }
 ]
 

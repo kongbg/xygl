@@ -2,7 +2,6 @@ import db from '../db/index.js';
 
 export default class GoodModel {
   static async getAll(params = {}) {
-    await db.read();
     let goods = db.data.goods || [];
 
     // 过滤已删除的商品

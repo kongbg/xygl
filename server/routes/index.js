@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import sourceRouter from './source.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -8,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default function registerRoutes(app) {
   // 读取当前目录下的所有文件
   const files = fs.readdirSync(__dirname);
-  
+
   // 遍历所有文件
   files.forEach(async (file) => {
     // 排除 index.js 和非 .js 文件
@@ -25,4 +26,7 @@ export default function registerRoutes(app) {
       }
     }
   });
+
+  app.use(sourceRouter.routes());
+  app.use(sourceRouter.allowedMethods());
 } 

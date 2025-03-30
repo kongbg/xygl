@@ -2,33 +2,45 @@
   <el-container class="layout-container">
     <!-- 侧边栏 -->
     <el-aside :width="isCollapse ? '64px' : '200px'" class="aside">
-      <el-menu
-        :default-active="route.path"
-        class="el-menu-vertical"
-        :collapse="isCollapse"
-        router
-      >
+      <el-menu :default-active="route.path" class="el-menu-vertical" :collapse="isCollapse" router>
         <el-menu-item index="/todo">
-          <el-icon><List /></el-icon>
+          <el-icon>
+            <List />
+          </el-icon>
           <span>待办事项</span>
         </el-menu-item>
         <el-menu-item index="/shop">
-          <el-icon><Shop /></el-icon>
+          <el-icon>
+            <Shop />
+          </el-icon>
           <span>店铺管理</span>
         </el-menu-item>
         <el-menu-item index="/good">
-          <el-icon><Goods /></el-icon>
+          <el-icon>
+            <Goods />
+          </el-icon>
           <span>商品管理</span>
         </el-menu-item>
         <el-menu-item index="/ydshop">
-          <el-icon><Shop /></el-icon>
+          <el-icon>
+            <Shop />
+          </el-icon>
           <span>闲鱼店铺</span>
         </el-menu-item>
         <el-menu-item index="/ydaccount">
-          <el-icon><User /></el-icon>
+          <el-icon>
+            <User />
+          </el-icon>
           <span>闲鱼账号</span>
         </el-menu-item>
-        
+        <el-menu-item index="/source">
+          <el-icon>
+            <Files />
+          </el-icon>
+          <span>资源库</span>
+        </el-menu-item>
+
+
       </el-menu>
     </el-aside>
 
@@ -44,7 +56,9 @@
         <div class="header-right">
           <el-dropdown>
             <span class="user-info">
-              Admin <el-icon><ArrowDown /></el-icon>
+              Admin <el-icon>
+                <ArrowDown />
+              </el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -67,7 +81,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { List, Shop, Goods, Expand, ArrowDown, User } from '@element-plus/icons-vue'
+import { List, Shop, Goods, Expand, ArrowDown, User, Files } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const isCollapse = ref(false)
@@ -93,26 +107,26 @@ const toggleSidebar = () => {
   height: 100%;
   background-color: #1f2d3d;
   border-right: none;
-  
+
   :deep(.el-menu-item) {
     background-color: #1f2d3d;
     color: #a6b0bc;
-    
+
     &:hover {
       background-color: #263445;
       color: #fff;
     }
-    
+
     &.is-active {
       background-color: #263445 !important;
       color: #409eff !important;
       border-right: 3px solid #409eff;
     }
-    
+
     .el-icon {
       color: inherit;
     }
-    
+
     span {
       color: inherit;
       margin-left: 10px;
@@ -134,7 +148,7 @@ const toggleSidebar = () => {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
   height: 50px;
 }
 
@@ -177,4 +191,4 @@ const toggleSidebar = () => {
     }
   }
 }
-</style> 
+</style>
