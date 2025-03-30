@@ -5,6 +5,8 @@ import session from 'koa-session';
 import registerRoutes from './routes/index.js';
 import responseHandler from './middleware/response.js';
 import paginationHandler from './middleware/pagination.js';
+import authMiddleware from './middleware/auth.js';
+import ydglAuthMiddleware from './middleware/ydglAuth.js';
 
 const app = new Koa();
 
@@ -28,6 +30,8 @@ app.use(cors({
   credentials: true, // 允许跨域携带cookie
   origin: 'http://localhost:5173' // 允许的前端域名
 }));
+app.use(authMiddleware);
+app.use(ydglAuthMiddleware);
 app.use(responseHandler);
 app.use(paginationHandler);
 

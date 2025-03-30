@@ -16,7 +16,7 @@ const routes = [
         path: 'todo',
         name: 'Todo',
         component: () => import('../views/todo/index.vue'),
-        meta: { 
+        meta: {
           title: '待办事项',
           icon: 'List',
           requiresAuth: true
@@ -72,6 +72,17 @@ const routes = [
           requiresAuth: true,
           hidden: true
         }
+      },
+      {
+        path: 'xygood',
+        name: 'XyGood',
+        component: () => import('../views/xygood/index.vue'),
+        meta: {
+          title: '闲鱼商品',
+          icon: 'Shop',
+          requiresAuth: true,
+          hidden: true
+        }
       }
     ]
   }
@@ -85,7 +96,7 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!token) {
       next('/login')

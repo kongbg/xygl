@@ -3,7 +3,7 @@ import db from '../db/index.js';
 export default class GoodModel {
   static async getAll(params = {}) {
     await db.read();
-    let goods = db.data.goods || [];
+    let goods = db.data.yxgoods || [];
 
     // 过滤已删除的商品
     goods = goods.filter(good => good.delFlag === 0);
@@ -44,14 +44,14 @@ export default class GoodModel {
 
   static async add(good) {
     await db.read();
-    if (!db.data.goods) {
-      db.data.goods = [];
+    if (!db.data.yxgoods) {
+      db.data.yxgoods = [];
     }
 
     if (Array.isArray(good)) {
-      db.data.goods = db.data.goods.concat(good);
+      db.data.yxgoods = db.data.yxgoods.concat(good);
     } else {
-      db.data.goods.push(good);
+      db.data.yxgoods.push(good);
     }
     await db.write();
     return good;
@@ -59,7 +59,7 @@ export default class GoodModel {
 
   static async update(goodId, updates) {
     await db.read();
-    const good = db.data.goods.find(g => g.goodId == goodId);
+    const good = db.data.yxgoods.find(g => g.goodId == goodId);
     if (good) {
       Object.assign(good, updates);
       await db.write();
@@ -70,7 +70,7 @@ export default class GoodModel {
 
   static async delete(goodId) {
     await db.read();
-    const good = db.data.goods.find(g => g.goodId === parseInt(goodId));
+    const good = db.data.yxgoods.find(g => g.goodId === parseInt(goodId));
     if (good) {
       good.delFlag = 1;
       await db.write();
@@ -81,22 +81,22 @@ export default class GoodModel {
 
   static async getById(goodId) {
     await db.read();
-    return db.data.goods.find(g => g.goodId === parseInt(goodId));
+    return db.data.yxgoods.find(g => g.goodId === parseInt(goodId));
   }
 
   static async getByShopId(shopId) {
     await db.read();
-    return db.data.goods.find(g => g.shopId == shopId);
+    return db.data.yxgoods.find(g => g.shopId == shopId);
   }
 
   static async getByIds(ids) {
     await db.read();
-    return db.data.goods.filter(g => ids.includes(g.id));
+    return db.data.yxgoods.filter(g => ids.includes(g.id));
   }
 
   // 通用查询
   static async queryData(params = {}) {
-    let data = db.data.goods;
+    let data = db.data.yxgoods;
     let queryParams = JSON.parse(JSON.stringify(params));
     delete queryParams.page;
     delete queryParams.pageSize;

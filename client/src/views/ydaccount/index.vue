@@ -9,11 +9,19 @@
           </el-button>
         </div>
       </template>
-      
+
       <!-- 账号列表 -->
       <el-table :data="accounts" style="width: 100%">
+        <el-table-column prop="shopName" label="店铺名称" />
         <el-table-column prop="username" label="账号" />
         <el-table-column prop="password" label="密码" />
+        <el-table-column prop="productCount" label="商品总数" width="100">
+          <template #default="{ row }">
+            <el-button link type="primary" @click="$router.push(`/xygood?accountId=${row.id}`)">
+              {{ row.productCount || 100 }}
+            </el-button>
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="row.status ? 'success' : 'info'">
@@ -28,89 +36,50 @@
         </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
-            <el-button
-              type="primary"
-              link
-              @click="handleEdit(row)"
-            >
+            <el-button type="primary" link @click="handleEdit(row)">
               编辑
             </el-button>
-            <el-button
-              type="success"
-              link
-              @click="handleToggleStatus(row)"
-            >
+            <el-button type="success" link @click="handleToggleStatus(row)">
               {{ row.status ? '禁用' : '启用' }}
             </el-button>
-            <el-button
-              type="danger"
-              link
-              @click="handleDelete(row)"
-            >
+            <el-button type="danger" link @click="handleDelete(row)">
               删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 分页 -->
       <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="page"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+        <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
+          :total="total" layout="total, sizes, prev, pager, next" @size-change="handleSizeChange"
+          @current-change="handleCurrentChange" />
       </div>
     </el-card>
 
     <!-- 编辑对话框 -->
-    <el-dialog
-      :title="dialogTitle"
-      v-model="dialogVisible"
-      width="500px"
-    >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="100px"
-      >
-        <el-form-item 
-          label="账号" 
-          prop="username"
-          :rules="[
-            { required: true, message: '请输入账号', trigger: 'blur' }
-          ]"
-        >
+    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="500px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="店铺名称" prop="shopName" :rules="[
+          { required: true, message: '请输入店铺名称', trigger: 'blur' }
+        ]">
+          <el-input v-model="form.shopName" placeholder="请输入店铺名称" />
+        </el-form-item>
+        <el-form-item label="账号" prop="username" :rules="[
+          { required: true, message: '请输入账号', trigger: 'blur' }
+        ]">
           <el-input v-model="form.username" placeholder="请输入账号" />
         </el-form-item>
-        
-        <el-form-item 
-          label="密码" 
-          prop="password"
-          :rules="[
-            { required: true, message: '请输入密码', trigger: 'blur' }
-          ]"
-        >
-          <el-input 
-            v-model="form.password" 
-            placeholder="请输入密码" 
-          />
+
+        <el-form-item label="密码" prop="password" :rules="[
+          { required: true, message: '请输入密码', trigger: 'blur' }
+        ]">
+          <el-input v-model="form.password" placeholder="请输入密码" />
         </el-form-item>
-        
+
         <el-form-item label="状态">
-          <el-switch
-            v-model="form.status"
-            :active-value="1"
-            :inactive-value="0"
-            inline-prompt
-            active-text="正常"
-            inactive-text="禁用"
-          />
+          <el-switch v-model="form.status" :active-value="1" :inactive-value="0" inline-prompt active-text="正常"
+            inactive-text="禁用" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -122,21 +91,20 @@
     </el-dialog>
 
     <!-- 添加二维码弹窗 -->
-    <el-dialog
-      title="请扫码登录"
-      v-model="qrDialogVisible"
-      width="400px"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-    >
+    <el-dialog title="请扫码登录" v-model="qrDialogVisible" width="400px" :close-on-click-modal="false"
+      :close-on-press-escape="false">
       <div class="qr-container">
         <img v-if="qrCode" :src="'data:image/png;base64,' + qrCode" />
         <div v-if="scanning" class="scanning-tip">
-          <el-icon class="is-loading"><Loading /></el-icon>
+          <el-icon class="is-loading">
+            <Loading />
+          </el-icon>
           正在等待扫码...
         </div>
         <div v-if="scanSuccess" class="success-tip">
-          <el-icon><CircleCheck /></el-icon>
+          <el-icon>
+            <CircleCheck />
+          </el-icon>
           扫码成功！
         </div>
       </div>
@@ -220,16 +188,17 @@ const handleAdd = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
         const formData = {
+          shopName: form.value.shopName,
           username: form.value.username,
           password: form.value.password,
           status: form.value.status
         }
-        
+
         if (isEdit.value) {
           await request.put(`/ydaccounts/${currentId.value}`, formData)
           ElMessage.success('编辑成功')
@@ -421,4 +390,4 @@ onUnmounted(() => {
 .scanning-tip {
   color: #409eff;
 }
-</style> 
+</style>

@@ -30,4 +30,7 @@ router.post('/:id/refresh', controller.refreshToken);
 // 检查扫码状态
 router.get('/scan/:instanceId', controller.checkScanStatus);
 
+// 上架商品
+router.post('/pushGood', controller.pushGood);
+
 export default router; 

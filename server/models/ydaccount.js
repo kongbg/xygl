@@ -18,6 +18,7 @@ export default class YdAccountModel {
       isBind: account.isBind || false,
       status: 1,  // 1: 正常, 0: 禁用
       delFlag: 0, // 0: 正常, 1: 已删除
+      publishedGoods: [],
       createTime: new Date().toISOString()
     };
 
@@ -55,5 +56,10 @@ export default class YdAccountModel {
   static async getById(id) {
     await db.read();
     return db.data.ydaccounts.find(a => a.id === id);
+  }
+
+  static async getByIds(ids) {
+    await db.read();
+    return db.data.ydaccounts.filter(a => ids.includes(a.id));
   }
 } 

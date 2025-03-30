@@ -9,7 +9,7 @@
           </el-button>
         </div>
       </template>
-      
+
       <!-- 店铺列表 -->
       <el-table :data="shops" style="width: 100%">
         <el-table-column prop="name" label="店铺名称" />
@@ -35,11 +35,7 @@
         <el-table-column prop="productCount" label="商品总数" width="100">
           <template #default="{ row }">
             <template v-if="row.isExtract">
-              <el-button 
-                link 
-                type="primary" 
-                @click="$router.push(`/good?shopId=${row.shopId}`)"
-              >
+              <el-button link type="primary" @click="$router.push(`/good?shopId=${row.shopId}`)">
                 {{ row.productCount }}
               </el-button>
             </template>
@@ -48,97 +44,61 @@
             </template>
           </template>
         </el-table-column>
-        
-        <el-table-column prop="status" label="状态" width="100">
+
+        <!-- <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-tag :type="row.status ? 'success' : 'info'">
               {{ row.status ? '正常' : '禁用' }}
             </el-tag>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
-            <el-button
-              type="primary"
-              link
-              @click="startParsing(row.shopId)"
-            >
+            <el-button type="primary" link @click="startParsing(row.shopId)">
               拉取店铺主页信息
             </el-button>
-            <el-button
-              type="primary"
-              link
-              @click="startParseGoods(row.shopId)"
-            >
+            <el-button type="primary" link @click="startParseGoods(row.shopId)">
               拉取商品概览信息
             </el-button>
-            <el-button
-              v-if="row.isExtract"
-              type="primary"
-              link
-              @click="startParseGoodDetail(row.shopId)"
-            >
+            <el-button v-if="row.isExtract" type="primary" link @click="startParseGoodDetail(row.shopId)">
               拉取商品详细信息
             </el-button>
-            <el-button
+            <!-- <el-button
               type="primary"
               link
               @click="handleEdit(row)"
             >
               编辑
-            </el-button>
-            <el-button
+            </el-button> -->
+            <!-- <el-button
               type="success"
               link
               @click="handleToggleStatus(row)"
             >
               {{ row.status ? '禁用' : '启用' }}
-            </el-button>
-            <el-button
-              type="danger"
-              link
-              @click="handleDelete(row)"
-            >
+            </el-button> -->
+            <el-button v-if="!row.isExtract" type="danger" link @click="handleDelete(row)">
               删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 分页 -->
       <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="page"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+        <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
+          :total="total" layout="total, sizes, prev, pager, next" @size-change="handleSizeChange"
+          @current-change="handleCurrentChange" />
       </div>
     </el-card>
 
     <!-- 编辑对话框 -->
-    <el-dialog
-      :title="dialogTitle"
-      v-model="dialogVisible"
-      width="500px"
-    >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="100px"
-      >
-        <el-form-item 
-          label="店铺链接" 
-          prop="url"
-          :rules="[
-            { required: true, message: '请输入店铺链接', trigger: 'blur' },
-            { type: 'url', message: '请输入正确的URL格式', trigger: 'blur' }
-          ]"
-        >
+    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="500px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="店铺链接" prop="url" :rules="[
+          { required: true, message: '请输入店铺链接', trigger: 'blur' },
+          { type: 'url', message: '请输入正确的URL格式', trigger: 'blur' }
+        ]">
           <el-input v-model="form.url" placeholder="请输入店铺链接" />
         </el-form-item>
       </el-form>
@@ -153,20 +113,10 @@
     </el-dialog>
 
     <!-- 解析进度对话框 -->
-    <el-dialog
-      title="店铺信息解析"
-      v-model="parseDialogVisible"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      width="400px"
-    >
+    <el-dialog title="店铺信息解析" v-model="parseDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false"
+      :show-close="false" width="400px">
       <div class="parse-dialog-content">
-        <el-progress 
-          type="circle" 
-          :percentage="parseProgress"
-          :status="parseStatus"
-        />
+        <el-progress type="circle" :percentage="parseProgress" :status="parseStatus" />
         <div class="parse-message">{{ parseMessage }}</div>
       </div>
     </el-dialog>
@@ -233,7 +183,7 @@ const handleEdit = (row) => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
@@ -245,10 +195,10 @@ const handleSubmit = async () => {
           const { data } = await request.post('/shops', form.value)
           newShop = data
         }
-        
+
         ElMessage.success(`${isEdit.value ? '编辑' : '新增'}成功`)
         dialogVisible.value = false
-        
+
         if (!isEdit.value) {
           // 新增店铺后开始解析
           startParsing(newShop.shopId)
@@ -312,24 +262,24 @@ const startParseGoodDetail = async (shopId) => {
   parseProgress.value = 0
   parseStatus.value = ''
   parseMessage.value = '正在拉取商品详细信息...'
-  
+
   // 模拟进度
   const timer = setInterval(() => {
     if (parseProgress.value < 90) {
       parseProgress.value += 10
     }
   }, 200)
-  
+
   try {
     const { data } = await request.post(`/shops/${shopId}/parseGoodDetail`)
     clearInterval(timer)
     parseProgress.value = 100
     parseStatus.value = 'success'
     parseMessage.value = '解析成功！'
-    
+
     // 更新列表数据
     fetchShops()
-    
+
     // 3秒后关闭对话框
     setTimeout(() => {
       parseDialogVisible.value = false
@@ -339,7 +289,7 @@ const startParseGoodDetail = async (shopId) => {
     parseProgress.value = 100
     parseStatus.value = 'exception'
     parseMessage.value = '解析失败：' + (error.message || '未知错误')
-    
+
     // 5秒后关闭对话框
     setTimeout(() => {
       parseDialogVisible.value = false
@@ -353,24 +303,24 @@ const startParseGoods = async (shopId) => {
   parseProgress.value = 0
   parseStatus.value = ''
   parseMessage.value = '正在拉取商品概览信息...'
-  
+
   // 模拟进度
   const timer = setInterval(() => {
     if (parseProgress.value < 90) {
       parseProgress.value += 10
     }
   }, 200)
-  
+
   try {
     const { data } = await request.post(`/shops/${shopId}/parseGood`)
     clearInterval(timer)
     parseProgress.value = 100
     parseStatus.value = 'success'
     parseMessage.value = '解析成功！'
-    
+
     // 更新列表数据
     fetchShops()
-    
+
     // 3秒后关闭对话框
     setTimeout(() => {
       parseDialogVisible.value = false
@@ -380,7 +330,7 @@ const startParseGoods = async (shopId) => {
     parseProgress.value = 100
     parseStatus.value = 'exception'
     parseMessage.value = '解析失败：' + (error.message || '未知错误')
-    
+
     // 5秒后关闭对话框
     setTimeout(() => {
       parseDialogVisible.value = false
@@ -394,24 +344,24 @@ const startParsing = async (shopId) => {
   parseProgress.value = 0
   parseStatus.value = ''
   parseMessage.value = '正在拉取店铺主页信息...'
-  
+
   // 模拟进度
   const timer = setInterval(() => {
     if (parseProgress.value < 90) {
       parseProgress.value += 10
     }
   }, 200)
-  
+
   try {
     const { data } = await request.post(`/shops/${shopId}/parse`)
     clearInterval(timer)
     parseProgress.value = 100
     parseStatus.value = 'success'
     parseMessage.value = '解析成功！'
-    
+
     // 更新列表数据
     fetchShops()
-    
+
     // 3秒后关闭对话框
     setTimeout(() => {
       parseDialogVisible.value = false
@@ -421,7 +371,7 @@ const startParsing = async (shopId) => {
     parseProgress.value = 100
     parseStatus.value = 'exception'
     parseMessage.value = '解析失败：' + (error.message || '未知错误')
-    
+
     // 5秒后关闭对话框
     setTimeout(() => {
       parseDialogVisible.value = false
@@ -474,4 +424,4 @@ fetchShops()
   text-align: center;
   color: #606266;
 }
-</style> 
+</style>

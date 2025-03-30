@@ -5,7 +5,9 @@
         <div class="card-header">
           <div class="header-left">
             <el-button link @click="$router.back()">
-              <el-icon><Back /></el-icon>
+              <el-icon>
+                <Back />
+              </el-icon>
               返回店铺列表
             </el-button>
             <span class="shop-name">{{ shopName }}</span>
@@ -15,7 +17,7 @@
           </el-button>
         </div>
       </template>
-      
+
       <!-- 商品列表 -->
       <el-table :data="goods" style="width: 100%">
         <el-table-column prop="name" label="商品名称" />
@@ -30,11 +32,7 @@
         <el-table-column prop="viewCot" label="浏览人数" width="100" />
         <el-table-column label="商品图片" width="100">
           <template #default="{ row }">
-            <el-image
-              style="width: 50px; height: 50px"
-              :src="row.picUrl"
-              :preview-src-list="[row.picUrl]"
-            />
+            <el-image style="width: 50px; height: 50px" :src="row.picUrl" :preview-src-list="[row.picUrl]" />
           </template>
         </el-table-column>
         <el-table-column prop="description" label="商品描述" show-overflow-tooltip>
@@ -65,156 +63,81 @@
         </el-table-column>
         <el-table-column label="操作" width="250" fixed="right">
           <template #default="{ row }">
-            <el-button
-              type="primary"
-              link
-              @click="handleEdit(row)"
-            >
+            <el-button type="primary" link @click="handleEdit(row)">
               编辑
             </el-button>
-            <el-button
-              type="success"
-              link
-              @click="handleToggleStatus(row)"
-            >
+            <el-button type="success" link @click="handleToggleStatus(row)">
               {{ row.status ? '禁用' : '启用' }}
             </el-button>
-            <el-button
-              type="danger"
-              link
-              @click="handleDelete(row)"
-            >
+            <el-button type="danger" link @click="handleDelete(row)">
               删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <!-- 分页 -->
       <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="page"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+        <el-pagination v-model:current-page="page" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
+          :total="total" layout="total, sizes, prev, pager, next" @size-change="handleSizeChange"
+          @current-change="handleCurrentChange" />
       </div>
     </el-card>
 
     <!-- 编辑对话框 -->
-    <el-dialog
-      :title="dialogTitle"
-      v-model="dialogVisible"
-      width="500px"
-    >
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        label-width="100px"
-      >
-        <el-form-item 
-          label="商品名称" 
-          prop="name"
-          :rules="[
-            { required: true, message: '请输入商品名称', trigger: 'blur' }
-          ]"
-        >
+    <el-dialog :title="dialogTitle" v-model="dialogVisible" width="500px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="商品名称" prop="name" :rules="[
+          { required: true, message: '请输入商品名称', trigger: 'blur' }
+        ]">
           <el-input v-model="form.name" placeholder="请输入商品名称" />
         </el-form-item>
-        
-        <el-form-item 
-          label="商品链接" 
-          prop="shareUrl"
-          :rules="[
-            { required: true, message: '请输入商品链接', trigger: 'blur' },
-            { type: 'url', message: '请输入正确的URL格式', trigger: 'blur' }
-          ]"
-        >
+
+        <el-form-item label="商品链接" prop="shareUrl" :rules="[
+          { required: true, message: '请输入商品链接', trigger: 'blur' },
+          { type: 'url', message: '请输入正确的URL格式', trigger: 'blur' }
+        ]">
           <el-input v-model="form.shareUrl" placeholder="请输入商品链接" />
         </el-form-item>
-        
-        <el-form-item 
-          label="商品编号" 
-          prop="no"
-        >
+
+        <el-form-item label="商品编号" prop="no">
           <el-input v-model="form.no" placeholder="请输入商品编号" />
         </el-form-item>
-        
-        <el-form-item 
-          label="价格" 
-          prop="price"
-          :rules="[
-            { required: true, message: '请输入价格', trigger: 'blur' },
-            { type: 'number', message: '价格必须为数字', trigger: 'blur' }
-          ]"
-        >
-          <el-input-number 
-            v-model="form.price" 
-            :precision="2" 
-            :step="0.01" 
-            :min="0"
-          />
+
+        <el-form-item label="价格" prop="price" :rules="[
+          { required: true, message: '请输入价格', trigger: 'blur' },
+          { type: 'number', message: '价格必须为数字', trigger: 'blur' }
+        ]">
+          <el-input-number v-model="form.price" :precision="2" :step="0.01" :min="0" />
         </el-form-item>
-        
-        <el-form-item 
-          label="库存" 
-          prop="stock"
-          :rules="[
-            { required: true, message: '请输入库存', trigger: 'blur' },
-            { type: 'number', message: '库存必须为数字', trigger: 'blur' }
-          ]"
-        >
-          <el-input-number 
-            v-model="form.stock" 
-            :min="0" 
-            :precision="0"
-          />
+
+        <el-form-item label="库存" prop="stock" :rules="[
+          { required: true, message: '请输入库存', trigger: 'blur' },
+          { type: 'number', message: '库存必须为数字', trigger: 'blur' }
+        ]">
+          <el-input-number v-model="form.stock" :min="0" :precision="0" />
         </el-form-item>
-        
-        <el-form-item 
-          label="商品描述" 
-          prop="description"
-        >
-          <el-input 
-            v-model="form.description" 
-            type="textarea" 
-            rows="3"
-            placeholder="请输入商品描述"
-          />
+
+        <el-form-item label="商品描述" prop="description">
+          <el-input v-model="form.description" type="textarea" rows="3" placeholder="请输入商品描述" />
         </el-form-item>
-        
+
         <el-form-item label="商品图片">
-          <el-upload
-            action="/api/upload"
-            list-type="picture-card"
-            :file-list="fileList"
-            :on-success="handleSuccess"
-            :on-remove="handleRemove"
-            :before-upload="beforeUpload"
-            :limit="5"
-            :on-exceed="handleExceed"
-          >
-            <el-icon><Plus /></el-icon>
+          <el-upload action="/api/upload" list-type="picture-card" :file-list="fileList" :on-success="handleSuccess"
+            :on-remove="handleRemove" :before-upload="beforeUpload" :limit="5" :on-exceed="handleExceed">
+            <el-icon>
+              <Plus />
+            </el-icon>
           </el-upload>
         </el-form-item>
-        
+
         <el-form-item label="售罄自动上架">
           <el-switch v-model="form.autoPush" />
         </el-form-item>
-        
+
         <el-form-item label="状态">
-          <el-switch
-            v-model="form.status"
-            :active-value="1"
-            :inactive-value="0"
-            inline-prompt
-            active-text="正常"
-            inactive-text="禁用"
-          />
+          <el-switch v-model="form.status" :active-value="1" :inactive-value="0" inline-prompt active-text="正常"
+            inactive-text="禁用" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -367,7 +290,7 @@ const handleAdd = () => {
 // 提交表单
 const handleSubmit = async () => {
   if (!formRef.value) return
-  
+
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
@@ -384,7 +307,7 @@ const handleSubmit = async () => {
           newGood = data
           ElMessage.success('新增成功')
         }
-        
+
         dialogVisible.value = false
         fetchGoods()
       } catch (error) {
@@ -490,4 +413,4 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
 }
-</style> 
+</style>

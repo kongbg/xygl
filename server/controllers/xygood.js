@@ -1,21 +1,23 @@
-import GoodModel from '../models/good.js';
+import GoodModel from '../models/xygood.js';
+import YdglTool from '../utils/ydgltool.js';
 
 // 获取商品列表
-// export const getGoods = async (ctx) => {
-//   const { shopId, shareUrl } = ctx.query;
-//   const goods = await GoodModel.getAll({ shopId, shareUrl });
-
-//   // 分页处理
-//   ctx.body = ctx.pagination.paginate(goods);
-// };
 export const getGoods = async (ctx) => {
-  let params = JSON.parse(JSON.stringify(ctx.query));
-  const goods = await GoodModel.queryData(params);
+  const ydglToken = ctx.state.ydglToken;
+  const accountId = ctx.state.ydglAccountId;
+  const params = JSON.parse(JSON.stringify(ctx.query));
 
-  if (params) {
-    ctx.body = ctx.pagination.paginate(goods);
-  } else {
-    ctx.body = goods;
+  try {
+    const goods = await YdglTool.getXYGoods(params, ydglToken);
+
+    if (ctx.query.pagination) {
+      ctx.body = ctx.pagination.paginate(goods);
+    } else {
+      ctx.body = goods;
+    }
+  } catch (error) {
+    console.error(`Error getting goods for account ${accountId}:`, error);
+    ctx.throw(500, 'Failed to get goods: ' + error.message);
   }
 };
 
@@ -82,4 +84,13 @@ export const parseGood = async (ctx) => {
   } catch (error) {
     ctx.throw(500, '解析失败：' + error.message);
   }
-}; 
+};
+
+export async function someYdglController(ctx) {
+  const ydglToken = ctx.state.ydglToken; // 获取中间件中设置的token
+
+  // 使用token调用YdglTool的方法
+  const result = await YdglTool.someMethod(ydglToken, ...otherParams);
+
+  // ... 其他逻辑
+} 
